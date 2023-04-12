@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.exportexcellearning.dao.StudentDao">
+
+    <resultMap type="com.example.exportexcellearning.entity.Student" id="StudentMap">
+        <result property="testid" column="testID" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="no" column="no" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StudentMap">
+        select
+          testID, name, no
+        from student
+        where testID = #{testid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="StudentMap">
+        select
+          testID, name, no
+        from student
+        <where>
+            <if test="testid != null">
+                and testID = #{testid}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="no != null">
+                and no = #{no}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from student
+        <where>
+            <if test="testid != null">
+                and testID = #{testid}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="no != null">
+                and no = #{no}
+            </if>
+        </where>
+    </select>
+    <select id="queryAll" resultType="com.example.exportexcellearning.entity.Student">
+        select * from student
+        <where>
+            <if test="testid != null">
+                and testID = #{testid}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="no != null">
+                and no = #{no}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="testid" useGeneratedKeys="true">
+        insert into student(name, no)
+        values (#{name}, #{no})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="testid" useGeneratedKeys="true">
+        insert into student(name, no)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.name}, #{entity.no})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="testid" useGeneratedKeys="true">
+        insert into student(name, no)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name}, #{entity.no})
+        </foreach>
+        on duplicate key update
+        name = values(name),
+        no = values(no)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update student
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="no != null">
+                no = #{no},
+            </if>
+        </set>
+        where testID = #{testid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from student where testID = #{testid}
+    </delete>
+
+</mapper>
+
